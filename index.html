@@ -83,10 +83,6 @@
 						<h1>Introduction</h1>
 					</section>
 					<section>
-						<h2>KINECT</h2>
-						<img src="images/kinect.png">
-					</section>
-					<section>
 						<h2>RAY-TRACING - DEFINITION</h2>
 						<p class="fragment">Ray-tracing is a image rendering technique that consists of taking a Point of View and launching rays onto an object that is inside of a grid so you can recreate raster-image of this object inside the grid</p>
 					</section>
@@ -110,40 +106,27 @@
 
 				<section>
 					<section>
-						<h1>PROCESSING</h1>
+						<h1>RAY-TRACING PSUDOCODE</h1>
 					</section>
 					<section>
-						<h2>PROCESSING</h2>
-						<!-- <img src="images/1.png"> -->
+						<h2>>RAY-TRACING PSUDOCODE</h2>
+						<!-- <img src="images/3.png"> -->
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>SHADING</h1>
 					</section>
 					<section>
-						<h2>OVERVIEW</h2>
-						<p><a href="https://processing.org/" target="_blank">Processing</a> is an open source programming language and environment for people who want to create images, animations, and interactions.</p>
+						<h2>>WHY IS SHADING BETTER FOR SHADING?</h2>
+						<ul>
+							<li class="fragment">Shading is used to create effects like shadows, soft shadows when area lights are used, and more generally global illumunation effects such as reflection, refraction, indirect reflections and indirect diffuse.</li>
+							<li class="fragment"></li>
+							<li class="fragment"></li>
+						</ul>
 					</section>
-					<section>
-						<h2>START WITH INECT IN PROCESSING</h2>
-						<p>The easiest way to install the library is with the <a href="https://processing.org/reference/environment/#Extensions" target="_blank">Processing Contributions Manager</a> Sketch → Import Libraries → Add library and search for “Kinect”. A button will appear labeled “install”.
-						<br>
-						Then, restart Processing.</p>
-					</section>
-					<section data-markdown>
-						## CODE
-						First thing is to include the proper import statements at the top of your code.
-						```
-						<section data-markdown>
-						  import org.openkinect.processing.*;
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						As well as a reference to a Kinect object, i.e.
-						```
-						<section data-markdown>
-						  Kinect kinect;
-						</section>
-						```
-					</section>
+					<!--
 					<section data-markdown>
 						## CODE
 						Then in setup() you can initialize that kinect object:
@@ -156,147 +139,7 @@
 						</section>
 						```
 					</section>
-					<section data-markdown>
-						## CODE
-						If you are using a Kinect v2, use a Kinect2 object instead.
-						```
-						<section data-markdown>
-						  Kinect2 kinect2;
-
-						  void setup() {
-  							kinect2 = new Kinect2(this);
-  							kinect2.initDevice();
-						  }
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Once you’ve done this you can begin to access data from the kinect sensor. 
-						```
-						<section data-markdown>
-						  PImage (RGB) from the kinect video camera.
-						  PImage (grayscale) from the kinect IR camera.
-  						  PImage (grayscale) with each pixel’s brightness mapped to depth (brighter = closer).
-						  PImage (RGB) with each pixel’s hue mapped to depth.
-						  int[] array with raw depth data (11 bit numbers between 0 and 2048).
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want to use the Kinect just like a regular old webcam, you can access the video image as a PImage!
-						```
-						<section data-markdown>
-						  PImage img = kinect.getVideoImage();
-						  image(img, 0, 0);
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the IR image:
-						```
-						<section data-markdown>
-						  void videoEvent(Kinect k) {
- 						   	// There has been a video event!
-						  }
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the IR image:
-						```
-						<section data-markdown>
-						  kinect.enableIR(true);
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						With kinect v1 cannot get both the video image and the IR image. They are both passed back via getVideoImage() so whichever one was most recently enabled is the one you will get. However, with the Kinect v2, they are both available as separate methods:
-						```
-						<section data-markdown>
-						  PImage video = kinect2.getVideoImage();
-						  PImage ir = kinect2.getIrImage();
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the depth image, you can request the grayscale image:
-						```
-						<section data-markdown>
-						  PImage img = kinect.getDepthImage();
-						  image(img, 0, 0);
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						As well as the raw depth data:
-						For the kinect v1, the raw depth values range between 0 and 2048, for the kinect v2 the range is between 0 and 4500.
-						```
-						<section data-markdown>
-						  int[] depth = kinect.getRawDepth();
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						For the color depth image, use kinect.enableColorDepth(true);. And just like with the video image, there’s a depth event you can access if necessary.
-						```
-						<section data-markdown>
-						  void depthEvent(Kinect k) {
- 							// There has been a depth event!
-						  }
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Unfortunately, b/c the RGB camera and the IR camera are not physically located in the same spot, there is a stereo vision problem.
-						The Kinect v2 offers what’s called a “registered” image which aligns all the depth values with the RGB camera ones. This can be accessed as follows:
-						```
-						<section data-markdown>
-						  PImage img = kinect2.getRegisteredImage()
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Finally, for kinect v1 (but not v2), you can also adjust the camera angle with the  setTilt() method.
-						```
-						<section data-markdown>
-						  float angle = kinect.getTilt();
-						  angle = angle + 1;
-						  kinect.setTilt(angle);
-						</section>
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Here are all the useful functions you might need to use the Processing kinect library:
-						```
-						<section data-markdown>
-						  initDevice() — start everything (video, depth, IR)
-						  activateDevice(int) - activate a specific device when multiple devices are connect
-						  initVideo() — start video only
-						  enableIR(boolean) — turn on or off the IR camera image (v1 only)
-						  initDepth() — start depth only
-						  enableColorDepth(boolean) — turn on or off the depth values as color image
-						  enableMirror(boolean) — mirror the image and depth data (v1 only)
-						  PImage getVideoImage() — grab the RGB (or IR for v1) video image
-						  PImage getIrImage() — grab the IR image (v2 only)
-	     				  PImage getDepthImage() — grab the depth map image
-						  PImage getRegisteredImage() — grab the registered depth image (v2 only)
-						  int[] getRawDepth() — grab the raw depth data
-						  float getTilt() — get the current sensor angle (between 0 and 30 degrees) (v1 only)
-						  setTilt(float) — adjust the sensor angle (between 0 and 30 degrees) (v1 only)
-						</section>
-						```
-					</section>
+					-->
 				</section>
 
 				<section>
