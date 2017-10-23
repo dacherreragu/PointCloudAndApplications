@@ -68,10 +68,10 @@
 				<section>
 					<h2>INDEX</h2>
 					<ol>
-						<li class="fragment"><a href="#/3">Introduction</a></li>
+						<li><a href="#/3">Introduction</a></li>
 						<li class="fragment"><a href="#/4">Ray-tracing pseudocode</a></li>
 						<li class="fragment"><a href="#/5">Shading</a></li>
-						<li class="fragment"><a href="#/6">Recursivity on Ray-tracing</a></li>
+						<li class="fragment"><a href="#/6">Recursivity in Ray-tracing</a></li>
 						<li class="fragment"><a href="#/7">Testing for Ray-geometric intersections</a></li>
 						<li class="fragment"><a href="#/8">Whitted Ray-tracing</a></li>
 						<li class="fragment"><a href="#/8">Montecarlo Method</a></li>
@@ -80,11 +80,11 @@
 
 				<section>
 					<section>
-						<h1>Introduction</h1>
+						<h1>INTRODUCTION</h1>
 					</section>
 					<section>
 						<h2>RAY-TRACING - DEFINITION</h2>
-						<p class="fragment">Ray-tracing is a image rendering technique that consists of taking a Point of View and launching rays onto an object that is inside of a grid so you can recreate raster-image of this object inside the grid</p>
+						<p>Ray-tracing is a image rendering technique that consists of taking a Point of View and launching rays onto an object that is inside of a grid so you can recreate raster-image of this object inside the grid.</p>
 					</section>
 					<section>
 						<h2>RAY-TRACING - DEFINITION</h2>
@@ -93,7 +93,7 @@
 					<section>
 						<h2>OVERVIEW</h2>
 						<ul>
-							<li class="fragment">Ray-tracing is image-centric since the outer loop iterates over all the pixels on the scene.</li>
+							<li>Ray-tracing is image-centric since the outer loop iterates over all the pixels on the scene.</li>
 							<li class="fragment">It is used to solve the visibility problem.</li>
 							<li class="fragment">Ray-tracing is better than Rastrerization for Shading, but is worst for Visualization.</li>
 						</ul>
@@ -110,7 +110,27 @@
 					</section>
 					<section>
 						<h2>>RAY-TRACING PSUDOCODE</h2>
-						<!-- <img src="images/3.png"> -->
+							<section data-markdown>
+								```
+						  		// loop over all pixels
+								Vec3f *framebuffer = new Vec3f[imageWidth * imageHeight]; 
+								for (int j = 0; j < imageHeight; ++j) { 
+    								for (int i = 0; i < imageWidth; ++i) { 
+        								for (int k = 0; k < numObjectsInScene; ++k) { 
+            								Ray ray = buildCameraRay(i, j); 
+            								if (intersect(ray, objects[k]) { 
+                								// do complex shading here but for now basic (just constant color)
+                								framebuffer[j * imageWidth + i] = objects[k].color; 
+            								} 
+            								else { 
+                								// or don't do anything and leave it black
+                								framebuffer[j * imageWidth + i] = backgroundColor; 
+            								} 
+        								} 
+    								} 
+								} 
+							```
+						</section>
 					</section>
 				</section>
 
@@ -121,26 +141,144 @@
 					<section>
 						<h2>>WHY IS SHADING BETTER FOR SHADING?</h2>
 						<ul>
-							<li class="fragment">Shading is used to create effects like shadows, soft shadows when area lights are used, and more generally global illumunation effects such as reflection, refraction, indirect reflections and indirect diffuse.</li>
-							<li class="fragment"></li>
-							<li class="fragment"></li>
+							<li>Shading is used to create effects like shadows, soft shadows when area lights are used, and more generally global illumunation effects such as reflection, refraction, indirect reflections and indirect diffuse.</li>
+							<li class="fragment">Ray-tracing is good at both solving the visibility problem and finding the visibility between surfaces.</li>
+							<li class="fragment">The shading process requires finding the visibility between surfaces.</li>
 						</ul>
 					</section>
-					<!--
-					<section data-markdown>
-						## CODE
-						Then in setup() you can initialize that kinect object:
-						```
-						<section data-markdown>
-						  void setup() {
-  							kinect = new Kinect(this);
-  							kinect.initDevice();
-						  }
-						</section>
-						```
+					<section>
+						<h2>SO... WHY DO GPUs USE RASTRERIZATION OVER RAY TRACING?</h2>
+						<!-- <img src="images/3.png"> -->
 					</section>
-					-->
+					<section>
+						<h2>CREATE AN IMAGE IN RAY-TRACING</h2>
+						<ul>
+							<li>Cast a ray for each pixel in the image.</li>
+							<li class="fragment">The first rays emitted are called primary rays or camera rays.</li>
+							<li class="fragment">More rays can be spawned from primary rays. These other rays are called secondary rays.</li>
+							<li class="fragment">When a primary ray is cast into the scene, the next step is to find if it intersects any object in the scene.</li>
+							<li class="fragment">When primary rays are used to solve the visibility problem, we can use the term ray-casting.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>HOW DOES SHADING WORK ON RAY-TRACING?</h2>
+						<p>There are 2 main types of rays, Primary rays and secondary rays, Secondary rays can be Shadow Rays or reflection rays depending on their function.</p>
+						<!-- <img class="fragment" src="images/4.png"> -->
+						<!-- <img class="fragment" src="images/5.png"> -->
+					</section>
 				</section>
+
+				<section>
+					<section>
+						<h1>RECURSIVITY IN RAY-TRACING</h1>
+					</section>
+					<section>
+						<h2>>RECURSIVITY IN RAY-TRACING</h2>
+						<ul>
+							<li>Each time a ray intersects a transparent surface, two new rays are generated (a reflection and a refraction ray). </li>
+							<li class="fragment">If these rays intersect another transparent object, each ray will generate two more rays.</li>
+							<li class="fragment">This practically means that render time also increases exponentially as the depth increases.</li>
+							<li class="fragment">The simplest solution to the recursive nature of this algorithm and the fact that the number of secondary rays grows exponentially as the depth increases, is to put a cap on the maximum number of allowed recursions (or maximum depth).</li>
+						</ul>
+					</section>
+					<section>
+						<h2>RECURSIVITY IN RAY-TRACING</h2>
+						<!-- <img src="images/6.png"> -->
+						<!-- <img class="fragment" src="images/7.png"> -->
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>TESTING FOR RAY-GEOMETRIC INTERSECTIONS</h1>
+					</section>
+					<section>
+						<h2>TESTING FOR RAY-GEOMETRIC INTERSECTIONS</h2>
+						<p>Testing if a ray intersects any object in the scene requires to loop over all the objects in the scene and test the current object against the ray.</p>
+						<section data-markdown>
+								```
+						  		Ray ray = buildCameraRay(i, j); 
+								for (int k = 0; k < numObjects; ++k) { 
+    								if (intersect(ray, objects[k]) { 
+        								// this ray intersects objects[k]
+    								} 
+								} 
+							```
+						</section>
+					</section>
+					<section>
+						<h2>GEOMETRY IN 3D</h2>
+						<ul>
+							<li><b>Simple shapes:</b> Can be defined mathematically, or parametrically.</li>
+							<li class="fragment"><b>Shapes of more complex objects:</b> Can only be described using polygon meshes, subdivisions surfaces or NURBS surfaces (or something equivalent).</li>
+						</ul>
+					</section>
+					<section>
+						<h2>COMPLEX SHAPES</h2>
+						<p>Convert each geometry type into the same internal representation, which in almost 99% of the cases, is going to be a triangulated polygon mesh.</p>
+						<!-- <img class="fragment" src="images/8.png"> -->
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>WHITTED RAY-TRACING</h1>
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<p>It’s one of the most classical examples of light transport algorithm based on ray-tracing.</p>
+						<!-- <img class="fragment" src="images/9.png"> -->
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<p>If an object A is a mirror like surface, and that an object B seats on top of it, then we would like to see the reflection of B into A.</p>
+						<p class="fragment">If A is not a flat surface, there is no easy solution for computing this reflection.</p>
+						<p class="fragment">Things get even harder if B is also reflective. Mirror surfaces keep reflecting images of themselves causing the "infinity room" effect.</p>
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<!-- <img src="images/10.png"> -->
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<p>The refraction direction can be computed using Snell's law and depends on the surface orientation (the surface's normal), the incoming light direction and the material refractive index (around 1.3 for water and 1.5 for glass).</p>
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<p>Whitted proposed to use these laws to compute the reflection and refraction direction of rays as they intersect reflective or transparent surfaces, and follow the path of these rays to find out the color of the object they would intersect.</p>
+					</section>
+					<section>
+						<h2>SNELL'S LAW</h2>
+						<p>Three cases:</p>
+						<ol>
+							<li>If the surface at the intersection point is opaque and diffuse, use the <a href="https://en.wikipedia.org/wiki/Phong_reflection_model" target=”_blank”>Phong model</a>, to compute the color of the object at the intersection point.</li>
+							<li class="fragment">If the surface is a mirror like surface, trace another reflection ray at the intersection point.</li>
+							<li class="fragment">if the surface is a transparent surface, cast another reflection and a refraction ray at the intersection point.</li>
+						</ol>
+					</section>
+					<section>
+						<h2>WHITTED RAY-TRACING</h2>
+						<!-- <img src="images/11.png"> -->
+						<!-- <img class="fragment" src="images/12.png"> -->
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h1>MONTE CARLO METHOD</h1>
+					</section>
+					<section>
+						<h2>MONTE CARLO METHOD</h2>
+						<p>Path tracing, occasionally referred to as Monte Carlo ray tracing, renders a 3D scene by randomly tracing samples of possible light paths. Repeated sampling of any given pixel will eventually cause the average of the samples to converge on the correct solution of the rendering equation, making it one of the most physically accurate 3D graphics rendering methods in existence.</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>REFERENCES</h2>
+						<ul>
+							<li class="fragment"><a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-overview/ray-tracing-rendering-technique-overview" target=”_blank”>An Overview of the Ray-Tracing Rendering Technique</a></li>
+					</section>
 
 				<section>
 					<section data-background="#dddddd">
@@ -179,16 +317,13 @@
 		<script src="js/reveal.js"></script>
 
 		<script>
-
 			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
 				controls: true,
 				progress: true,
 				history: true,
 				center: true,
-
 				transition: 'slide', // none/fade/slide/convex/concave/zoom
-
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
 					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
@@ -199,7 +334,6 @@
 					{ src: 'plugin/notes/notes.js', async: true }
 				]
 			});
-
 		</script>
 
 	</body>
