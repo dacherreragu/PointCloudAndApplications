@@ -109,25 +109,25 @@
 						<h1>RAY-TRACING PSUDOCODE</h1>
 					</section>
 					<section>
-						<h2>>RAY-TRACING PSUDOCODE</h2>
+						<h2>RAY-TRACING PSUDOCODE</h2>
 							<section data-markdown>
 								```
 						  		// loop over all pixels
 								Vec3f *framebuffer = new Vec3f[imageWidth * imageHeight]; 
 								for (int j = 0; j < imageHeight; ++j) { 
-    								for (int i = 0; i < imageWidth; ++i) { 
-        								for (int k = 0; k < numObjectsInScene; ++k) { 
-            								Ray ray = buildCameraRay(i, j); 
-            								if (intersect(ray, objects[k]) { 
-                								// do complex shading here but for now basic (just constant color)
-                								framebuffer[j * imageWidth + i] = objects[k].color; 
-            								} 
-            								else { 
-                								// or don't do anything and leave it black
-                								framebuffer[j * imageWidth + i] = backgroundColor; 
-            								} 
-        								} 
-    								} 
+    							    for (int i = 0; i < imageWidth; ++i) { 
+        						        for (int k = 0; k < numObjectsInScene; ++k) { 
+            					            Ray ray = buildCameraRay(i, j); 
+            					            if (intersect(ray, objects[k]) { 
+                				                // do complex shading here but for now basic (just constant color)
+                				                framebuffer[j * imageWidth + i] = objects[k].color; 
+            					            } 
+            					            else { 
+                				                // or don't do anything and leave it black
+                				                framebuffer[j * imageWidth + i] = backgroundColor; 
+            					            } 
+        						        } 
+    							    } 
 								} 
 							```
 						</section>
@@ -139,7 +139,7 @@
 						<h1>SHADING</h1>
 					</section>
 					<section>
-						<h2>>WHY IS SHADING BETTER FOR SHADING?</h2>
+						<h2>WHY IS SHADING BETTER FOR SHADING?</h2>
 						<ul>
 							<li>Shading is used to create effects like shadows, soft shadows when area lights are used, and more generally global illumunation effects such as reflection, refraction, indirect reflections and indirect diffuse.</li>
 							<li class="fragment">Ray-tracing is good at both solving the visibility problem and finding the visibility between surfaces.</li>
@@ -173,12 +173,12 @@
 						<h1>RECURSIVITY IN RAY-TRACING</h1>
 					</section>
 					<section>
-						<h2>>RECURSIVITY IN RAY-TRACING</h2>
+						<h2>RECURSIVITY IN RAY-TRACING</h2>
 						<ul>
 							<li>Each time a ray intersects a transparent surface, two new rays are generated (a reflection and a refraction ray). </li>
 							<li class="fragment">If these rays intersect another transparent object, each ray will generate two more rays.</li>
 							<li class="fragment">This practically means that render time also increases exponentially as the depth increases.</li>
-							<li class="fragment">The simplest solution to the recursive nature of this algorithm and the fact that the number of secondary rays grows exponentially as the depth increases, is to put a cap on the maximum number of allowed recursions (or maximum depth).</li>
+							<li class="fragment"><p>The simplest solution to the recursive nature of this algorithm and the fact that the number of secondary rays grows exponentially as the depth increases,</p> <p>is to put a cap on the maximum number of allowed recursions (or maximum depth).</p></li>
 						</ul>
 					</section>
 					<section>
@@ -197,11 +197,11 @@
 						<p>Testing if a ray intersects any object in the scene requires to loop over all the objects in the scene and test the current object against the ray.</p>
 						<section data-markdown>
 								```
-						  		Ray ray = buildCameraRay(i, j); 
+								Ray ray = buildCameraRay(i, j); 
 								for (int k = 0; k < numObjects; ++k) { 
-    								if (intersect(ray, objects[k]) { 
-        								// this ray intersects objects[k]
-    								} 
+								    if (intersect(ray, objects[k]) { 
+								        // this ray intersects objects[k]
+								    } 
 								} 
 							```
 						</section>
@@ -289,10 +289,6 @@
 						<a href="#" class="navigate-down">
 							<img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
 						</a>
-					</section>
-					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png">
-						<h2>Image Backgrounds</h2>
-						<pre><code class="hljs">&lt;section data-background="image.png"&gt;</code></pre>
 					</section>
 					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
 						<h2>Tiled Backgrounds</h2>
