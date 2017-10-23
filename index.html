@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Point Cloud</title>
+		<title>Ray-Tracing</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -59,8 +59,7 @@
 				</section>
 
 				<section>
-					<h1>KINECT AND PROCESSING</h1>
-					<h3>POINT CLOUD</h3>
+					<h1>RAY-TRACING</h1>
 					<p>
 						<small>Created by <a href="https://chala8.github.io" target=”_blank”>Daniel Chala</a> / <a href="https://dacherreragu.github.io/" target=”_blank”>David Herrera</a></small>
 					</p>
@@ -69,40 +68,43 @@
 				<section>
 					<h2>INDEX</h2>
 					<ol>
-						<li class="fragment"><a href="#/3">Kinect</a></li>
-						<li class="fragment"><a href="#/4">Processing </a></li>
-						<li class="fragment"><a href="#/5">Point Cloud</a></li>
+						<li class="fragment"><a href="#/3">Introduction</a></li>
+						<li class="fragment"><a href="#/4">Ray-tracing pseudocode</a></li>
+						<li class="fragment"><a href="#/5">Shading</a></li>
+						<li class="fragment"><a href="#/6">Recursivity on Ray-tracing</a></li>
+						<li class="fragment"><a href="#/7">Testing for Ray-geometric intersections</a></li>
+						<li class="fragment"><a href="#/8">Whitted Ray-tracing</a></li>
+						<li class="fragment"><a href="#/8">Montecarlo Method</a></li>
 					</ol>
 				</section>
 
 				<section>
 					<section>
-						<h1>KINECT</h1>
+						<h1>Introduction</h1>
 					</section>
 					<section>
 						<h2>KINECT</h2>
 						<img src="images/kinect.png">
 					</section>
 					<section>
+						<h2>RAY-TRACING - DEFINITION</h2>
+						<p class="fragment">Ray-tracing is a image rendering technique that consists of taking a Point of View and launching rays onto an object that is inside of a grid so you can recreate raster-image of this object inside the grid</p>
+					</section>
+					<section>
+						<h2>RAY-TRACING - DEFINITION</h2>
+						<!-- <img src="images/1.png"> -->
+					</section>
+					<section>
 						<h2>OVERVIEW</h2>
-						<p>The Microsoft Kinect sensor is a peripheral device that functions much like a webcam. However, in addition to providing an RGB image, it also provides a depth map. Meaning for every pixel seen by the sensor, the Kinect measures distance from the sensor.</p>
+						<ul>
+							<li class="fragment">Ray-tracing is image-centric since the outer loop iterates over all the pixels on the scene.</li>
+							<li class="fragment">It is used to solve the visibility problem.</li>
+							<li class="fragment">Ray-tracing is better than Rastrerization for Shading, but is worst for Visualization.</li>
+						</ul>
 					</section>
 					<section>
-						<h2>HOW DOES KINECT WORKS?</h2>
-						<p>The Kinect sensor itself only measures color and depth.</p>
-						<div class="fragment">Once that information is on your computer, lots more can be done like “skeleton” tracking.</div>
-					</section>
-					<section>
-						<h2>SKELETON TRACKING</h2>	
-						<p><span class="fragment">Windows: </span> <span class="fragment"><a href="https://github.com/ThomasLengeling/KinectPV2" target=”_blank”>Thomas Lengling’s windows-only Kinect v2 processing libray</a>.</span>
-						<div class="fragment">Mac: </div> <span class="fragment"><a href="https://github.com/OpenKinect/libfreenect" target=”_blank”>libfreenect</a> and <a href="https://github.com/OpenKinect/libfreenect2" target=”_blank”>libfreenect2</a>.</span>
-						</p>					
-					</section>
-					<section>
-						<h2>HARDWARE</h2>	
-						<p><span class="fragment">Standalone Kinect Sensor v1.</span>
-						<div class="fragment">Standalone Kinect Sensor v2.</div>
-						</p>					
+						<h2>OVERVIEW</h2>
+						<!-- <img src="images/2.png"> -->
 					</section>
 				</section>
 
@@ -112,7 +114,7 @@
 					</section>
 					<section>
 						<h2>PROCESSING</h2>
-						<img src="images/processing.png">
+						<!-- <img src="images/1.png"> -->
 					</section>
 					<section>
 						<h2>OVERVIEW</h2>
