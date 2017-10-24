@@ -74,7 +74,7 @@
 						<li class="fragment"><a href="#/6">Recursivity in Ray-tracing</a></li>
 						<li class="fragment"><a href="#/7">Testing for Ray-geometric intersections</a></li>
 						<li class="fragment"><a href="#/8">Whitted Ray-tracing</a></li>
-						<li class="fragment"><a href="#/8">Montecarlo Method</a></li>
+						<li class="fragment"><a href="#/9">Montecarlo Method</a></li>
 					</ol>
 				</section>
 
@@ -163,7 +163,9 @@
 					<section>
 						<h2>HOW DOES SHADING WORK ON RAY-TRACING?</h2>
 						<p>There are 2 main types of rays, Primary rays and secondary rays, Secondary rays can be Shadow Rays or reflection rays depending on their function.</p>
-						<img class="fragment" src="images/4.png">
+					</section>
+						<h2>HOW DOES SHADING WORK ON RAY-TRACING?</h2>
+						<img src="images/4.png">
 						<img class="fragment" src="images/5.png">
 					</section>
 				</section>
@@ -182,7 +184,7 @@
 					<section>
 						<h2>RECURSIVITY IN RAY-TRACING</h2>
 						<ul>
-							<li class="fragment">This practically means that render time also increases exponentially as the depth increases.</li>
+							<li>This practically means that render time also increases exponentially as the depth increases.</li>
 							<li class="fragment">The simplest solution to the recursive nature of this algorithm and the fact that the number of secondary rays grows exponentially as the depth increases, is to put a cap on the maximum number of allowed recursions (or maximum depth).</li>
 						</ul>
 					</section>
