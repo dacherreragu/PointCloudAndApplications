@@ -17,3 +17,6 @@
     import SimpleOpenNI.*;
     SimpleOpenNI kinect;
   ```
+
+## HOW TO EXECUTE
+### After installing the dependencies, connect your Kinect and execute the main codes in Processing 2. Finally, press "Run" and you will be able to use each application.
