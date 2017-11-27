@@ -3,41 +3,39 @@ import SimpleOpenNI.*;
 
 SimpleOpenNI kinect;
 float        zoomF =0.5f;
-  float        rotX = radians(180);  // por defecto, rotar la escena 180 grados sobre el eje x, 
-                                   // los datos de openni vienen al revés.
+float        rotX = radians(180);  
 float        rotY = radians(0);
 
-int         steps           = 3; //para acelerar el dibujo, hacerlo cada tercer punto
+int         steps           = 3; 
 float       strokeW         = 0.6;
 boolean texture;
-PVector   s_rwp = new PVector(); // standarized realWorldPoint;
+PVector   s_rwp = new PVector(); 
 int       kdh;
 int       kdw;
 int       max_edge_len = 50;
 float     strokeWgt = 0.4;
-int       i00, i01, i10, i11; // índices
-PVector   p00, p10, p01, p11; // puntos
-PVector   k_rwp; // kinect realWorldPoint;
+int       i00, i01, i10, i11; 
+PVector   p00, p10, p01, p11; 
+PVector   k_rwp; 
 
   
 void setup()
 {
   size(1024,768,OPENGL);
 
-  //kinect = new SimpleOpenNI(this,SimpleOpenNI.RUN_MODE_SINGLE_THREADED);
+
   kinect = new SimpleOpenNI(this);
-  // desactivar espejo
   kinect.setMirror(false);
-  // habilitar la generación de depthMap 
+
   if(kinect.enableDepth() == false) {
-     println("No se puede abrir el depthMap, ¡tal vez la cámara no está conectada!"); 
+     println("Can't open the depthMap, maybe the camera is not connected!"); 
      exit();     return;
   }
   if(kinect.enableRGB() == false) {
-     println("No se puede abrir el rgbMap, ¡tal vez la cámara no está conectada o no hay rgbSensor!"); 
+     println("Can't open the rgbMap, maybe the camera is not connected or there is no rgbSensor!"); 
      exit();     return;
   }
-  // alinear datos de profundidad a datos de imagen
+  // align depth data to image data
   kinect.alternativeViewPointDepthToImage();
   
   kdh = kinect.depthHeight();
@@ -47,7 +45,7 @@ void setup()
   smooth();
   stroke(0);
   perspective(radians(45),
-              float(width)/float(height),
+              float(width*10000)/float(height*10000),
               10,150000);
 }
 
@@ -55,12 +53,13 @@ void draw()
 {
    kinect.update();
    PImage    rgbImage = kinect.rgbImage();
+   PImage    textures = loadImage("text3.jpeg");
    PVector[] realWorldMap = kinect.depthMapRealWorld();
 
 
   background(0,0,0);
   
-  // establecer la posición de la escena
+    // set the scene pos
   translate(width/2, height/2, 0);
   rotateX(rotX);
   rotateY(rotY);
@@ -69,6 +68,7 @@ void draw()
   if (strokeWgt == 0) noStroke();
   else strokeWeight(strokeWgt);
   
+  println(frameRate);
 
  for(int y=0;y < kdh-steps;y+=steps)
   {
@@ -87,10 +87,12 @@ void draw()
       p11 = realWorldMap[i11];
       beginShape(TRIANGLES);  
       if(texture==true){
-        texture(rgbImage);} // llenar el triángulo con la textura rgb
-      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && // revisar para valores no válidos
-          (abs(p00.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len)) { // revisar para la longitud del borde
-            vertex(p00.x,p00.y,p00.z, x, y); // x,y,x,u,v   posición + referencia de textura
+        texture(rgbImage);}
+      else{
+        texture(textures);} // llenar el triangulo con una textura
+      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && //reviza por valores no validos
+          (abs(p00.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len)) { //busca la longitud del borde
+            vertex(p00.x,p00.y,p00.z, x, y); // x,y,x,u,v   posicion y referencia de la textura
             vertex(p01.x,p01.y,p01.z, x, y+steps);
             vertex(p10.x,p10.y,p10.z, x+steps, y);
           }
@@ -116,6 +118,7 @@ void keyPressed()
     case '+': if (steps < 9) steps++; break;
     case '-': if (steps > 1) steps--; break;
     case '5': texture=true; break;
+    case '6': texture=false; break;
   }
  switch(keyCode)
   {

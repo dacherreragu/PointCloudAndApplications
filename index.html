@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Final Project</title>
+		<title>Point Cloud and applications through Kinect.</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -59,7 +59,7 @@
 				</section>
 
 				<section>
-					<h1>FINAL PROJECT</h1>
+					<h1>POINT CLOUD AND APPLICATIONS THROUGH KINECT</h1>
 					<p>
 						<small>Created by <a href="https://chala8.github.io" target=”_blank”>Daniel Chala</a> / <a href="https://dacherreragu.github.io/" target=”_blank”>David Herrera</a></small>
 					</p>
@@ -153,6 +153,19 @@
 					</section>
 					<section>
 						<h2>REVIEWED ARTICLES</h2>
+						<ul>
+							<li>Zhang, C., Chen, T. (2001).
+								<a href="http://ieeexplore.ieee.org/abstract/document/958278/?reload=true"
+								target="_blank">Efficient feature extraction for 2D/3D objects in
+								mesh representation</a>.</li>
+								<li>Cignoni, P., Callieri, M., Corsini, M., Dellepiane, M., Ganovelli, F.,
+									Ranzuglia, G. (2008).
+									<a href="http://ieeexplore.ieee.org/abstract/document/5980567/"
+									target="_blank">3D is here: Point Cloud Library (PCL)</a>.</li>
+								<li>Rheiner, M. (2014).
+										<a href="https://github.com/wexstorm/simple-openni"
+										target="_blank">Simple OpenNI</a>.</li>
+						</ul>
 					</section>
 					<section>
 						<h2>PROPOSED PROBLEMS</h2>
@@ -188,31 +201,595 @@
 
 				<section>
 					<section>
-						<h1>PROPOSED SOLUTION</h1>
+						<h1>PROPOSED SOLUTIONS</h1>
 					</section>
 					<section>
-						<h2>RAY-TRACING PSUDOCODE</h2>
-							<section data-markdown>
-								```
-								// loop over all pixels
-								Vec3f *framebuffer = new Vec3f[imageWidth * imageHeight];
-								for (int j = 0; j < imageHeight; ++j) {
-								    for (int i = 0; i < imageWidth; ++i) {
-								        for (int k = 0; k < numObjectsInScene; ++k) {
-								            Ray ray = buildCameraRay(i, j);
-								            if (intersect(ray, objects[k]) {
-								                // do complex shading here but for now basic (just constant color)
-								                framebuffer[j * imageWidth + i] = objects[k].color;
-								            }
-								            else {
-								                // or don't do anything and leave it black
-								                framebuffer[j * imageWidth + i] = backgroundColor;
-								            }
-								        }
-								    }
+						<h2>PROPOSED SOLUTIONS</h2>
+						<ul>
+							<li>
+								<p><b>Minority Report Menu:</b> Find the closest point and interpolating
+									its position as it moves.</p>
+									<p>Manage more variables to keep track of the location of all the
+										images and remembering which image the user is currently controlling.</p>
+									<p>The user will have the ability to scale each image by moving her hand.</p>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>MInority report menu</h3>
+						<img src="images/5.png">
+					</section>
+					<section data-markdown>
+						## CODE: MINORITY REPORT MENU
+						```
+						import SimpleOpenNI.*;
+						SimpleOpenNI kinect;
+
+						int kinectWidth = 640;
+						int kinectHeight = 480;
+						float reScale;
+
+						int closestValue;
+						int closestX;
+						int closestY;
+						float lastX;
+						float lastY;
+
+						int count=0;
+						int [] recentX=new int[3];
+						int [] recentY=new int[3];
+
+						int currentImage = 0;
+
+						ScalableImage [] picCollection = new ScalableImage[3];
+
+						void setup()
+						{
+							size(1920, 1080);
+							kinect = new SimpleOpenNI(this);
+							kinect.enableDepth();
+							kinect.enableRGB();
+
+							reScale = (float) width / kinectWidth;
+
+							for (int i = 0; i < picCollection.length; i++)
+							{
+								picCollection[i]=new ScalableImage();
+								picCollection[i].content=loadImage("image"+(i+1)+".gif");
+							}
+						}
+
+						void draw()
+						{
+							scale(reScale);
+							background(0);
+							closestValue = 8000;
+							kinect.update();
+							int[] depthValues = kinect.depthMap();
+							for (int y = 0; y < 480; y++)
+							{
+								for (int x = 0; x < 640; x++)
+								{
+									int i = x + y * 640;
+									int currentDepthValue = depthValues[i];
+									if (currentDepthValue > 610 && currentDepthValue < 1300 && currentDepthValue < closestValue)
+									{
+										closestValue = currentDepthValue;
+										recentX[count]=x;
+										recentY[count]=y;
+									}
 								}
-							```
-						</section>
+							}
+
+							count++;
+							if (count>2)
+							{
+								count=0;
+							}
+
+							closestX=(recentX[0]+recentX[1]+recentX[2])/3;
+							closestY=(recentY[0]+recentY[1]+recentY[2])/3;
+
+							float interpolatedX = lerp(lastX, closestX, 0.3);
+							float interpolatedY = lerp(lastY, closestY, 0.3);
+
+							picCollection[currentImage].imageX=interpolatedX;
+							picCollection[currentImage].imageY=interpolatedY;
+							picCollection[currentImage].imageScale=map(closestValue, 610, 1300, 0, 4);
+
+							image(kinect.rgbImage(), 0, 0);
+
+							for (int i = 0; i < picCollection.length; i++)
+							{
+								ScalableImage picture=new ScalableImage();
+								picture=picCollection[i];
+								image(picture.content, picture.imageX, picture.imageY, picture.imageWidth * picture.imageScale, picture.imageHeight * picture.imageScale);
+							}
+
+							lastX = interpolatedX;
+							lastY = interpolatedY;
+						}
+
+						void mousePressed()
+						{
+							// incrementar imagen actual
+							currentImage++;
+
+							if (currentImage > 2)
+							{
+								currentImage = 0;
+							}
+							println(currentImage);
+						}
+						```
+					</section>
+					<section data-markdown>
+						## CODE: MINORITY REPORT MENU (SCALABLE IMAGE)
+						```
+						class ScalableImage
+						{
+							float imageX,imageY;
+							float imageScale;
+							int imageWidth,imageHeight;
+							PImage content;
+
+							ScalableImage()
+							{
+								imageWidth=100;
+								imageHeight=100;
+							}
+						}
+						```
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<ul>
+							<li>
+								<p><b>Air Drum Kit:</b> Create Hotpoints, which when making
+									contact with point of the captured cloud, they change of color and
+									produce sound.</p>
+							</li>
+						</ul>
+						<img src="images/7.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Air drum kit</h3>
+						<img src="images/6.png">
+					</section>
+					<section data-markdown>
+						## CODE: AIR DRUM KIT
+						```
+						import processing.opengl.*;
+						import SimpleOpenNI.*;
+						import ddf.minim.*;
+						SimpleOpenNI kinect;
+						float rotation = 0;
+						// cuatro objetos AudioSnippet
+						Minim minim;
+						AudioSnippet kick;
+						AudioSnippet snare;
+						AudioSnippet kick1;
+						AudioSnippet snare1;
+						// declarar los dos objetos hotpoint
+						Hotpoint snareTrigger;
+						Hotpoint kickTrigger;
+						Hotpoint snareTrigger1;
+						Hotpoint kickTrigger1;
+						float s = 1;
+						void setup()
+						{
+							size(1024, 768, OPENGL);
+							kinect = new SimpleOpenNI(this);
+							kinect.enableDepth();
+							minim = new Minim(this);
+							// cargar ambos archivos de audio
+							snare = minim.loadSnippet("kick.wav");
+							kick = minim.loadSnippet("kick.wav");
+							snare1 = minim.loadSnippet("hat.wav");
+							kick1 = minim.loadSnippet("hat.wav");
+							// inicializar hotpoints con sus orígines (x,y,z) y su tamaño
+							snareTrigger = new Hotpoint(200, 0, 600, 150);
+							kickTrigger = new Hotpoint(-200, 0, 600, 150);
+							snareTrigger1 = new Hotpoint(400, -150, 600, 150);
+							kickTrigger1 = new Hotpoint(-400, -150, 600, 150);
+						}
+
+						void draw()
+						{
+							background(0);
+							kinect.update();
+							translate(width/2, height/2, -1000);
+							rotateX(radians(180));
+							translate(0, 0, 1400);
+							rotateY(radians(map(mouseX, 0, width, -180, 180)));
+							translate(0, 0, s*-1000);
+							scale(s);
+							stroke(255);
+							PVector[] depthPoints = kinect.depthMapRealWorld();
+							for (int i = 0; i < depthPoints.length; i+=10)
+							{
+								PVector currentPoint = depthPoints[i];
+								// revisar cada hotpoint para ver si incluye el punto actual (currentPoint)
+								snareTrigger.check(currentPoint);
+								snareTrigger1.check(currentPoint);
+								kickTrigger.check(currentPoint);
+								kickTrigger1.check(currentPoint);
+								point(currentPoint.x, currentPoint.y, currentPoint.z);
+							}
+							println(snareTrigger.pointsIncluded);
+							if(snareTrigger.isHit())
+							{
+								snare.play();
+							}
+							if(!snare.isPlaying())
+							{
+								snare.rewind();
+							}
+							if(snareTrigger1.isHit())
+							{
+								snare1.play();
+							}
+							if(!snare1.isPlaying())
+							{
+								snare1.rewind();
+							}
+							if (kickTrigger.isHit())
+							{
+								kick.play();
+							}
+							if(!kick.isPlaying())
+							{
+								kick.rewind();
+							}
+							if (kickTrigger1.isHit())
+							{
+								kick1.play();
+							}
+							if(!kick.isPlaying())
+							{
+								kick1.rewind();
+							}
+							// mostrar cada hotpoint y borrar sus puntos
+							snareTrigger.draw();
+							snareTrigger.clear();
+							kickTrigger.draw();
+							kickTrigger.clear();
+							snareTrigger1.draw();
+							snareTrigger1.clear();
+							kickTrigger1.draw();
+							kickTrigger1.clear();
+						}
+						void stop()
+						{
+							// asegurarse de cerrar
+							// ambos objetos AudioPlayer
+							kick.close();
+							snare.close();
+							kick1.close();
+							snare1.close();
+							minim.stop();
+							super.stop();
+						}
+						void keyPressed()
+						{
+							if (keyCode == 38)
+							{
+								s = s + 0.01;
+							}
+							if (keyCode == 40)
+							{
+								s = s - 0.01;
+							}
+						}
+						```
+					</section>
+					<section data-markdown>
+						## CODE: AIR DRUM KIT (HOTPOINTS)
+						```
+						class Hotpoint
+						{
+							PVector center;
+							color fillColor;
+							color strokeColor;
+							int size;
+							int pointsIncluded;
+							int maxPoints;
+							boolean wasJustHit;
+							int threshold;
+							Hotpoint(float centerX, float centerY, float centerZ, int boxSize)
+							{
+								center = new PVector(centerX, centerY, centerZ);
+								size = boxSize;
+								pointsIncluded = 0;
+								maxPoints = 1000;
+								threshold = 0;
+								fillColor = strokeColor = color(random(255), random(255), random(255));
+							}
+							void setThreshold( int newThreshold )
+							{
+								threshold = newThreshold;
+							}
+							void setMaxPoints(int newMaxPoints)
+							{
+								maxPoints = newMaxPoints;
+							}
+							void setColor(float red, float blue, float green)
+							{
+								fillColor = strokeColor = color(red, blue, green);
+							}
+							boolean check(PVector point)
+							{
+								boolean result = false;
+								if (point.x > center.x - size/2 && point.x < center.x + size/2)
+								{
+									if (point.y > center.y - size/2 && point.y < center.y + size/2)
+									{
+										if (point.z > center.z - size/2 && point.z < center.z + size/2)
+										{
+											result = true;
+											pointsIncluded++;
+										}
+									}
+								}
+								return result;
+							}
+							void draw()
+							{
+								pushMatrix();
+								translate(center.x, center.y, center.z);
+								fill(red(fillColor), blue(fillColor), green(fillColor),
+								255 * percentIncluded());
+								stroke(red(strokeColor), blue(strokeColor), green(strokeColor), 255);
+								box(size);
+								popMatrix();
+							}
+							float percentIncluded()
+							{
+								return map(pointsIncluded, 0, maxPoints, 0, 1);
+							}
+							boolean currentlyHit()
+							{
+								return (pointsIncluded > threshold);
+							}
+							boolean isHit()
+							{
+								return currentlyHit() && !wasJustHit;
+							}
+							void clear()
+							{
+								wasJustHit = currentlyHit();
+								pointsIncluded = 0;
+							}
+						}
+						```
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<ul>
+							<li>
+								<p><b>Mesh Capture:</b> Capture the current point cloud</p>
+								<p>The algorithm simply reconstructs the triangles taking into account
+									that the pointcloud is organized in rows and collumns, so adjacent x-y pixels'
+									points will be connected by triangles.</p>
+								<p>Changing clockwise / counterclockwise will flip the face's normals
+									and affect the render, for example when you use lighting.</p>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<ul>
+							<li>
+								<p><b>Mesh Capture:</b> Triangles ar only drawn if all of their vertex
+									are valid ( z != 0), and if the length of all edges is small enough
+									(not to draw triangles between distant vertex).</p>
+								<p>Pressing '5' turns on the RGB mod. That is, the mesh  is shown
+									with the texture taken by Kinect.</p>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<ul>
+							<li>
+								<p><b>Mesh Capture:</b> Pressing '6', the mesh takes a inserted texture.</p>
+								<p>The number of points to take (each 1, 2, 3, ...)
+									can be chosen,in order to increase or decrease the quality of the mesh.</p>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, without texture.</h3>
+						<img src="images/8.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with texture captured by Kinect.</h3>
+						<img src="images/9.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with inserted texture and low resolution.</h3>
+						<img src="images/10.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with inserted texture and high resolution.</h3>
+						<img src="images/11.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with inserted texture and medium resolution.</h3>
+						<img src="images/12.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with another inserted texture and medium resolution.</h3>
+						<img src="images/13.png">
+					</section>
+					<section>
+						<h2>PROPOSED SOLUTIONS</h2>
+						<h3>Polygonal mesh, with inserted texture and very-high resolution.</h3>
+						<img src="images/14.png">
+					</section>
+					<section data-markdown>
+						## CODE: MESH CAPTURE
+						```
+						import SimpleOpenNI.*;
+
+
+						SimpleOpenNI kinect;
+						float zoomF =0.5f;
+						float rotX = radians(180);
+						float rotY = radians(0);
+
+						int steps = 3;
+						float strokeW = 0.6;
+						boolean texture;
+						PVector s_rwp = new PVector();
+						int kdh;
+						int kdw;
+						int max_edge_len = 50;
+						float
+						strokeWgt = 0.4;
+						int i00, i01, i10, i11;
+						PVector p00, p10, p01, p11;
+						PVector k_rwp;
+
+						void setup()
+						{
+							size(1024,768,OPENGL);
+
+							kinect = new SimpleOpenNI(this);
+							kinect.setMirror(false);
+
+							if(kinect.enableDepth() == false)
+							{
+								println("Can't open the depthMap, maybe the camera is not connected!");
+								exit();
+								return;
+							}
+							if(kinect.enableRGB() == false)
+							{
+								println("Can't open the rgbMap, maybe the camera is not connected or there is no rgbSensor!");
+								exit();
+								return;
+							}
+							// alinear datos de profundidad a datos de imagen
+							kinect.alternativeViewPointDepthToImage();
+
+							kdh = kinect.depthHeight();
+							kdw = kinect.depthWidth();
+
+							smooth();
+							stroke(0);
+
+							perspective(radians(45),
+							float(width*10000)/float(height*10000),10,150000);
+						}
+
+						void draw()
+						{
+							kinect.update();
+							PImage rgbImage = kinect.rgbImage();
+							PImage textures = loadImage("text3.jpeg");
+							PVector[] realWorldMap = kinect.depthMapRealWorld();
+
+							background(0,0,0);
+
+							// set the scene pos
+							translate(width/2, height/2, 0);
+							rotateX(rotX);
+							rotateY(rotY);
+							scale(zoomF);
+
+							if (strokeWgt == 0) noStroke();
+							else strokeWeight(strokeWgt);
+
+							println(frameRate);
+
+							for(int yc=c0; y < kdh-steps; y+= steps)
+							{
+								int y_steps_kdw = (y+steps)*kdw;
+								int y_kdw = y * kdw;
+								for(int x=0;x < kdw-steps;x+=steps)
+								{
+									i00 = x + y_kdw;
+									i01 = x + y_steps_kdw;
+									i10 = (x + steps) + y_kdw;
+									i11 = (x + steps) + y_steps_kdw;
+
+									p00 = realWorldMap[i00];
+									p01 = realWorldMap[i01];
+									p10 = realWorldMap[i10];
+									p11 = realWorldMap[i11];
+									beginShape(TRIANGLES);
+									if(texture==true)
+									{
+										texture(rgbImage);
+									}
+									else
+									{
+										texture(textures);} // llenar el triangulo con una textura
+										if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && //revisa por valores no validos
+										(abs(p00.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len))
+										{ //busca la longitud del borde
+											vertex(p00.x,p00.y,p00.z, x, y); // x,y,x,u,v posicion y referencia de la textura
+											vertex(p01.x,p01.y,p01.z, x, y+steps);
+											vertex(p10.x,p10.y,p10.z, x+steps, y);
+										}
+										if ((p11.z > 0) && (p01.z > 0) && (p10.z > 0) &&
+										(abs(p11.z-p01.z) < 50) && (abs(p10.z-p01.z) < max_edge_len))
+										{
+											vertex(p01.x,p01.y,p01.z, x, y+steps);
+											vertex(p11.x,p11.y,p11.z, x+steps, y+steps);
+											vertex(p10.x,p10.y,p10.z, x+steps, y);
+										}
+										endShape();
+									}
+								}
+							}
+
+							void keyPressed()
+							{
+								switch(key)
+								{
+									case '+': if (steps < 9) steps++; break;
+									case '-': if (steps > 1) steps--; break;
+									case '5': texture=true; break;
+									case '6': texture=false; break;
+								}
+								switch(keyCode)
+								{
+									case LEFT:
+									rotY += 0.1f;
+									break;
+									case RIGHT:
+									// zoom out
+									rotY -= 0.1f;
+									break;
+									case UP:
+									if(keyEvent.isShiftDown())
+									zoomF += 0.01f;
+									else
+									rotX += 0.1f;
+									break;
+									case DOWN:
+									if(keyEvent.isShiftDown())
+									{
+										zoomF -= 0.01f;
+										if(zoomF < 0.01)
+										zoomF = 0.01;
+									}
+									else
+									rotX -= 0.1f;
+									break;
+								}
+							}
+						```
 					</section>
 				</section>
 
@@ -225,6 +802,48 @@
 				<section>
 					<section>
 						<h1>CONCLUSIONS</h1>
+					</section>
+					<section>
+						<h2>ACTIVITIES REALIZED</h2>
+						<ul>
+							<li>Capture point cloud with Kinect.</li>
+							<li class="fragment">Create a polygon mesh from the point cloud, using
+								the texture detected by Kinect.</li>
+							<li class="fragment">Create a polygon mesh from the point cloud, using
+								a inserted texture.</li>
+							<li class="fragment">Change the quality of the polygon mesh drawn,
+								according to the number of points of the cloud taken.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>ACTIVITIES REALIZED</h2>
+						<ul>
+							<li>Produce changes in a hotpoint (color change and
+								sound generation) when it makes contact with points of the cloud.</li>
+							<li class="fragment">Obtain information about the location of a projected
+								object by interpolating its closest points.</li>
+							<li class="fragment">Manipulate the scale of an object by gestures
+								made with the hand.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>LIMITATIONS</h2>
+						<ul>
+							<li>The mesh could not be exported in an editable format.</li>
+							<li class="fragment">In Minority Report, photos are not released by a gesture.</li>
+							<li class="fragment">The sound times in Air Drum Kit were not cut to
+								sound frequently.</li>
+							<li class="fragment">In Air Drum Kit, the point cloud is displayed
+								instead of the polygon mesh.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>FUTURE WORK</h2>
+						<ul>
+							<li>Investigate the implementation of SimpleOpenNi in processing 3.0.</li>
+							<li class="fragment">Build the polygon mesh with other algorithms,
+								to compare them and know which is more optimal.</li>
+						</ul>
 					</section>
 				</section>
 
