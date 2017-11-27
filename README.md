@@ -1,4 +1,4 @@
-<font color='blue'>POINT CLOUD AND APPLICATIONS THROUGH KINECT</font>
+# <center> POINT CLOUD AND APPLICATIONS THROUGH KINECT </center>
 * [Daniel Chala](https://chala8.github.io/)
 * [David Herrera](https://dacherreragu.github.io/)
 
